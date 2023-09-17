@@ -1,0 +1,232 @@
+{
+  "name": "vsc-gpt-aide",
+  "displayName": "GPTAIDE: write and improve code using AI",
+  "description": "Extension that allows you to use OpeanAI's ChatGPT inside the IDE (unofficial)",
+  "version": "0.1.0",
+  "publisher": "michaelxxie",
+  "icon": "resources/extensionIcon.png",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/timkmecl/chatgpt-vscode"
+  },
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "copilot",
+    "openai",
+    "chatgpt",
+    "ai",
+    "explain",
+    "find bugs",
+    "explain ",
+    "refactor"
+  ],
+  "activationEvents": [
+    "onView:gptaide.chatView",
+    "onCommand:gptaide.ask",
+    "onCommand:gptaide.explain",
+    "onCommand:gptaide.refactor",
+    "onCommand:gptaide.optimize",
+    "onCommand:gptaide.problems"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gptaide.ask",
+        "title": "GPT-REFACTOR: 问问 ChatGPT"
+      },
+      {
+        "command": "gptaide.explain",
+        "title": "GPT-REFACTOR: 解释一下这段代码"
+      },
+      {
+        "command": "gptaide.refactor",
+        "title": "GPT-REFACTOR: 重构一下这段代码"
+      },
+      {
+        "command": "gptaide.findProblems",
+        "title": "GPT-REFACTOR: 这段代码有bug吗"
+      },
+      {
+        "command": "gptaide.optimize",
+        "title": "GPT-REFACTOR: 优化一下这段代码"
+      },
+      {
+        "command": "gptaide.conversationId",
+        "title": "Set ChatGPT conversation ID"
+      },
+      {
+        "command": "gptaide.resetConversation",
+        "title": "Reset ChatGPT conversation"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gptaide.ask",
+          "when": "editorTextFocus",
+          "group": "gptaide-menu-group@1"
+        },
+        {
+          "command": "gptaide.explain",
+          "when": "editorHasSelection",
+          "group": "gptaide-menu-group@2"
+        },
+        {
+          "command": "gptaide.refactor",
+          "when": "editorHasSelection",
+          "group": "gptaide-menu-group@3"
+        },
+        {
+          "command": "gptaide.findProblems",
+          "when": "editorHasSelection",
+          "group": "gptaide-menu-group@4"
+        },
+        {
+          "command": "gptaide.optimize",
+          "when": "editorHasSelection",
+          "group": "gptaide-menu-group@5"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "gptaide.ask"
+        },
+        {
+          "command": "gptaide.explain",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptaide.refactor",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptaide.findProblems",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptaide.optimize",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptaide.conversationId"
+        },
+        {
+          "command": "gptaide.resetConversation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gptaide",
+          "title": "gpt-aide",
+          "icon": "resources/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "gptaide": [
+				{
+					"type": "webview",
+					"id": "gptaide.chatView",
+					"name": "gpt-aide"
+				}
+      ]
+    },
+    "configuration": {
+      "title": "gpt-aide",
+      "type": "object",
+      "properties": {
+        "gptaide.sessionToken": {
+          "type": "string",
+          "description": "设置你的openAI API key：chat.openai.com ",
+          "order": 1
+        },
+        "gptaide.pasteOnClick": {
+          "type": "boolean",
+          "default": true,
+          "description": "单击响应中的代码块将其粘贴到编辑器中",
+          "order": 2
+        },
+        "gptaide.promptPrefix.explain": {
+          "type": "string",
+          "default": "解释一下这段代码: ",
+          "description": "用于解释所选代码的prompt",
+          "order": 3
+        },
+        "gptaide.promptPrefix.refactor": {
+          "type": "string",
+          "default": "重构一下这段代码: ",
+          "description": "用于重构所选代码的prompt",
+          "order": 4
+        },
+        "gptaide.promptPrefix.findProblems": {
+          "type": "string",
+          "default": "找一下这段代码中存在的问题，并提出修复建议 (不要改变任何实现逻辑): ",
+          "description": "用于查找所选代码中问题的提示前缀",
+          "order": 5
+        },
+        "gptaide.promptPrefix.optimize": {
+          "type": "string",
+          "default": "优化一下这段代码: ",
+          "description": "用于优化所选代码的提示前缀",
+          "order": 6
+        },
+        "gptaide.keepConversation": {
+          "type": "boolean",
+          "default": true,
+          "description": "通过对所有请求使用相同的对话 ID 来保持对话的进行（允许后续问题）",
+          "order": 7
+        },
+        "gptaide.timeoutLength": {
+          "type": "number",
+          "default": "60",
+          "description": "请求在超时之前应等待响应多长时间（以秒为单位）",
+          "order": 8
+        },
+        "gptaide.selectedInsideCodeblock": {
+          "type": "boolean",
+          "default": true,
+          "description": "将所选代码追加为代码块 （“”...代码...'''） 而不是纯文本",
+          "order": 9
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "chatgpt": "5.2.5"
+  }
+}
